@@ -1,6 +1,7 @@
 package gettask
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -9,8 +10,9 @@ import (
 )
 
 var (
-	ErrMethodRequest = errors.New("GET Is not GET Request")
-	ErrTaskNotFound  = errors.New("GET task not found")
+	ErrMethodRequest  = errors.New("GET Is not GET Request")
+	ErrFailedMarshal  = errors.New("GET Failed to marshal json")
+	ErrFailedResponse = errors.New("GET Failed to write response")
 )
 
 type TaskStore interface {
@@ -26,13 +28,25 @@ func New(store TaskStore) http.HandlerFunc {
 
 		idTask := chi.URLParam(r, "id")
 
-		_, err := store.Get(idTask)
+		data, err := store.Get(idTask)
 		if err != nil {
-			http.Error(w, ErrTaskNotFound.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		resp, err := json.Marshal(data)
+		if err != nil {
+			http.Error(w, ErrFailedMarshal.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+
+		_, err = w.Write(resp)
+		if err != nil {
+			http.Error(w, ErrFailedResponse.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }
