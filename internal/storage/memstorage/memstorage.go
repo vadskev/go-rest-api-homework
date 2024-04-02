@@ -63,3 +63,11 @@ func (store *MemStorage) Get(id string) (model.Task, error) {
 	}
 	return store.data[id], nil
 }
+
+func (store *MemStorage) Delete(id string) error {
+	if _, ok := store.data[id]; !ok {
+		return ErrTaskNotFound
+	}
+	delete(store.data, id)
+	return nil
+}
