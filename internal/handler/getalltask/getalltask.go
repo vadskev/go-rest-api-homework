@@ -3,6 +3,7 @@ package getalltask
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/vadskev/go-rest-api-homework/internal/model"
@@ -19,7 +20,6 @@ type TaskStore interface {
 
 func New(store TaskStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		data, err := store.GetAll()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -37,7 +37,7 @@ func New(store TaskStore) http.HandlerFunc {
 
 		_, err = w.Write(resp)
 		if err != nil {
-			http.Error(w, ErrFailedResponse.Error(), http.StatusInternalServerError)
+			log.Println(ErrFailedResponse.Error())
 			return
 		}
 	}

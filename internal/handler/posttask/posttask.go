@@ -24,11 +24,6 @@ func New(store TaskStore) http.HandlerFunc {
 		var task model.Task
 		var buf bytes.Buffer
 
-		if r.Method != http.MethodPost {
-			http.Error(w, ErrMethodRequest.Error(), http.StatusBadRequest)
-			return
-		}
-
 		_, err := buf.ReadFrom(r.Body)
 		if err != nil {
 			http.Error(w, ErrFailedDecodeRequest.Error(), http.StatusBadRequest)
@@ -46,7 +41,6 @@ func New(store TaskStore) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 	}
 }

@@ -3,6 +3,7 @@ package gettask
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -21,11 +22,6 @@ type TaskStore interface {
 
 func New(store TaskStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			http.Error(w, ErrMethodRequest.Error(), http.StatusBadRequest)
-			return
-		}
-
 		idTask := chi.URLParam(r, "id")
 
 		data, err := store.Get(idTask)
@@ -45,7 +41,7 @@ func New(store TaskStore) http.HandlerFunc {
 
 		_, err = w.Write(resp)
 		if err != nil {
-			http.Error(w, ErrFailedResponse.Error(), http.StatusInternalServerError)
+			log.Println(ErrFailedResponse.Error())
 			return
 		}
 	}
