@@ -9,9 +9,8 @@ import (
 )
 
 var (
-	ErrFailedGetStorage = errors.New("GET Failed to get local storage")
-	ErrFailedResponse   = errors.New("GET Failed to write response")
-	ErrFailedMarshal    = errors.New("GET Failed to marshal json")
+	ErrFailedResponse = errors.New("GET Failed to write response")
+	ErrFailedMarshal  = errors.New("GET Failed to marshal json")
 )
 
 type TaskStore interface {
@@ -23,7 +22,7 @@ func New(store TaskStore) http.HandlerFunc {
 
 		data, err := store.GetAll()
 		if err != nil {
-			http.Error(w, ErrFailedGetStorage.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
